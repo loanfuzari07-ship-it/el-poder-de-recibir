@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frecuencia Celestial</title>
+  <meta name="theme-color" content="#0f172a" />
+  <style>
+    :root{
+      --bg:#f3f6fb;
+      --ink:#0f172a;
+      --muted:#5b6473;
+      --card:#ffffff;
+      --line:#e7ebf3;
+      --blue:#3a63ff;
+      --blue2:#6f59ff;
+      --green:#16a34a;
+      --green2:#22c55e;
+      --orange:#ff6d1a;
+      --orange2:#ff9a3d;
+      --soft:#f8faff;
+      --shadow:0 22px 65px rgba(15,23,42,.10);
+      --shadow-sm:0 12px 30px rgba(15,23,42,.08);
+      --radius:26px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top, rgba(111,89,255,.12), transparent 26%),
+        radial-gradient(circle at 100% 0, rgba(34,197,94,.09), transparent 18%),
+        linear-gradient(180deg,#f7f9fd 0%,#f2f5fa 100%);
+      line-height:1.55;
+    }
+
+    .page{
+      width:min(100% - 28px, 820px);
+      margin:0 auto;
+      padding:22px 0 72px;
+    }
+
+    .top-wrap{
+      margin-bottom:22px;
+    }
+
+    .order-status{
+      background:linear-gradient(135deg,#0f172a 0%, #1e293b 100%);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:20px;
+      box-shadow:0 20px 50px rgba(15,23,42,.20);
+      padding:16px 18px;
+      text-align:center;
+    }
+
+    .status-title{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      font-size:14px;
+      line-height:1.2;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+    }
+
+    .status-dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:#22c55e;
+      box-shadow:0 0 0 0 rgba(34,197,94,.55);
+      animation:pulse 1.5s infinite;
+      flex:0 0 auto;
+    }
+
+    .status-text{
+      margin-top:6px;
+      color:#dbe5f3;
+      font-size:13px;
+      font-weight:600;
+    }
+
+    @keyframes pulse{
+      0%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}
+      70%{box-shadow:0 0 0 10px rgba(34,197,94,0)}
+      100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}
+    }
+
+    .selected{
+      margin-top:16px;
+      background:linear-gradient(135deg,#179444 0%,#1db954 100%);
+      color:#fff;
+      border-radius:18px;
+      padding:16px 18px;
+      text-align:center;
+      box-shadow:0 18px 40px rgba(29,185,84,.24);
+      border:1px solid rgba(255,255,255,.22);
+    }
+
+    .selected strong{
+      display:block;
+      font-size:18px;
+      line-height:1.15;
+      margin-bottom:4px;
+    }
+
+    .selected span{
+      display:block;
+      font-size:14px;
+      font-weight:700;
+    }
+
+    .hero-card,
+    .section-card{
+      background:rgba(255,255,255,.84);
+      backdrop-filter:blur(10px);
+      border:1px solid rgba(231,235,243,.95);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+    }
+
+    .hero-card{
+      padding:28px 24px 22px;
+      text-align:center;
+    }
+
+    .hero h1,
+    .section h2,
+    p{margin-top:0}
+
+    .hero h1{
+      font-size:clamp(34px,6vw,56px);
+      line-height:1.02;
+      letter-spacing:-.04em;
+      margin-bottom:18px;
+      font-weight:950;
+      color:#121826;
+    }
+
+    .hero p,
+    .section p{
+      margin-bottom:8px;
+      color:var(--muted);
+      font-size:18px;
+    }
+
+    .bridge{
+      margin:28px 0 14px;
+      font-size:22px;
+      line-height:1.2;
+      font-weight:900;
+      color:#273142;
+    }
+
+    .mockup-wrap{
+      display:flex;
+      justify-content:center;
+      margin:0 auto 18px;
+    }
+
+    .mockup-img{
+      width:min(100%, 500px);
+      max-width:500px;
+      height:auto;
+      display:block;
+      filter:drop-shadow(0 18px 36px rgba(58,99,255,.12));
+    }
+
+    .product-title{
+      margin:8px 0 10px;
+      font-size:clamp(34px,5vw,48px);
+      line-height:1.03;
+      letter-spacing:-.035em;
+      font-weight:950;
+      background:linear-gradient(90deg,var(--blue),var(--blue2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+
+    .lead-audio{
+      color:#364152 !important;
+      font-weight:750;
+      margin-bottom:14px !important;
+    }
+
+    .copy{
+      max-width:660px;
+      margin-left:auto;
+      margin-right:auto;
+    }
+
+    .benefits-card,
+    .mini-card,
+    .offer-card{
+      width:min(100%, 680px);
+      margin-left:auto;
+      margin-right:auto;
+      border-radius:28px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-sm);
+    }
+
+    .benefits-card,
+    .mini-card{
+      padding:24px 26px;
+      text-align:left;
+      margin-top:24px;
+    }
+
+    .benefits-card ul,
+    .receive-list,
+    .mini-card ul{
+      list-style:none;
+      padding:0;
+      margin:0;
+    }
+
+    .benefits-card li,
+    .receive-list li,
+    .mini-card li{
+      padding:6px 0;
+      font-size:18px;
+      color:#26303f;
+    }
+
+    .section{
+      margin-top:28px;
+      text-align:center;
+    }
+
+    .section-card{
+      padding:28px 22px 26px;
+    }
+
+    .section h2{
+      font-size:clamp(30px,5vw,44px);
+      line-height:1.06;
+      letter-spacing:-.035em;
+      margin:0 auto 18px;
+      font-weight:950;
+      max-width:720px;
+    }
+
+    .offer-card{
+      position:relative;
+      overflow:hidden;
+      padding:28px 24px 24px;
+      background:linear-gradient(180deg,#ffffff 0%,#fbfcff 100%);
+      margin-top:12px;
+    }
+
+    .offer-card::before{
+      content:"";
+      position:absolute;
+      top:0;
+      left:0;
+      right:0;
+      height:7px;
+      background:linear-gradient(90deg,var(--blue),var(--blue2),#87a5ff);
+    }
+
+    .offer-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      background:#eef3ff;
+      border:1px solid #dfe7ff;
+      color:#304ccf;
+      border-radius:999px;
+      padding:8px 14px;
+      font-size:13px;
+      font-weight:900;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      margin-bottom:16px;
+    }
+
+    .offer-stack{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:16px;
+    }
+
+    .old-price{
+      font-size:24px;
+      font-weight:900;
+      color:#8b95a7;
+      text-decoration:line-through;
+      margin-bottom:6px;
+      letter-spacing:-.03em;
+    }
+
+    .offer-subline{
+      font-size:16px;
+      font-weight:800;
+      color:#4c5565;
+      margin-bottom:10px;
+    }
+
+    .price-wrap{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:7px;
+    }
+
+    .price{
+      display:inline-flex;
+      align-items:flex-start;
+      justify-content:center;
+      gap:4px;
+      padding:10px 22px 14px;
+      border-radius:22px;
+      background:linear-gradient(180deg,#f4f7ff 0%,#eef2ff 100%);
+      border:1px solid #dce4ff;
+      color:#101827;
+      font-weight:950;
+      letter-spacing:-.05em;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.85);
+    }
+
+    .price .currency{font-size:28px;line-height:1.35}
+    .price .amount{font-size:74px;line-height:1}
+    .price .cents{font-size:28px;line-height:1.35}
+    .price .usd{font-size:14px;line-height:1.4;margin-top:26px;letter-spacing:.06em;color:#677287;font-weight:800}
+
+    .single-pay{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:140px;
+      border-radius:999px;
+      background:linear-gradient(135deg,#1ca84f 0%, #2fcc6c 100%);
+      color:#fff;
+      font-size:14px;
+      font-weight:900;
+      padding:8px 16px;
+      box-shadow:0 12px 28px rgba(34,197,94,.24);
+    }
+
+    .local-price{
+      display:none;
+      margin-top:9px;
+      padding:9px 15px;
+      border-radius:14px;
+      background:#eef3ff;
+      border:1px solid #dbe4ff;
+      color:#3346c8;
+      font-size:17px;
+      line-height:1.25;
+      font-weight:900;
+      box-shadow:0 7px 18px rgba(58,99,255,.08);
+    }
+
+    .local-price strong{
+      color:#2137bf;
+      font-weight:950;
+    }
+
+    .funnel-wrap{
+      width:min(100%,560px);
+      margin:14px auto 0;
+      padding:0;
+      border:0;
+      background:transparent;
+      overflow:visible;
+    }
+
+    .funnel-wrap iframe{
+      display:block;
+      width:100%;
+      min-height:90px;
+      border:0;
+      background:transparent;
+    }
+
+    .urgency{
+      margin:18px auto 8px;
+      text-align:center;
+      color:#465162;
+      font-size:17px;
+      font-weight:700;
+    }
+
+    .last-chance{
+      text-align:center;
+      color:var(--orange);
+      font-size:18px;
+      font-weight:950;
+      max-width:660px;
+      margin:0 auto 2px;
+    }
+
+    .divider{
+      height:1px;
+      width:min(100%,680px);
+      margin:28px auto;
+      background:linear-gradient(90deg,transparent,#d8deea,transparent);
+    }
+
+    .receive-list{
+      width:min(100%,560px);
+      margin:0 auto;
+      text-align:center;
+    }
+
+    .closing{
+      margin-top:16px !important;
+      color:#4c5666 !important;
+      font-weight:650;
+    }
+
+    .bottom-offer{
+      margin-top:30px;
+    }
+
+
+    .anchor-cta{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:min(100%, 560px);
+      min-height:58px;
+      margin:22px auto 4px;
+      padding:16px 22px;
+      border-radius:16px;
+      background:linear-gradient(135deg,#16a34a 0%,#22c55e 100%);
+      color:#fff;
+      text-decoration:none;
+      font-size:17px;
+      line-height:1.2;
+      font-weight:950;
+      letter-spacing:-.01em;
+      box-shadow:0 16px 34px rgba(34,197,94,.28);
+      transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+
+    .anchor-cta:hover{
+      transform:translateY(-2px);
+      box-shadow:0 20px 40px rgba(34,197,94,.34);
+      filter:brightness(1.02);
+    }
+
+    .anchor-cta:active{
+      transform:translateY(0);
+    }
+
+    @media (max-width: 560px){
+      .page{width:min(100% - 20px, 820px);padding:16px 0 52px}
+      .order-status{padding:14px 12px;border-radius:16px}
+      .status-title{font-size:12px}
+      .status-text{font-size:11.5px}
+      .selected{padding:14px 12px;border-radius:14px}
+      .selected strong{font-size:16px}
+      .selected span{font-size:13px}
+      .hero-card,.section-card{border-radius:22px}
+      .hero-card{padding:24px 14px 18px}
+      .section-card{padding:24px 14px 22px}
+      .hero h1{font-size:38px}
+      .hero p,.section p{font-size:16px}
+      .bridge{font-size:18px;margin-top:22px}
+      .mockup-wrap{margin-bottom:14px}
+      .product-title{font-size:34px}
+      .benefits-card,.mini-card{padding:20px 16px;border-radius:18px}
+      .benefits-card li,.receive-list li,.mini-card li{font-size:16px}
+      .section h2{font-size:32px}
+      .offer-card{padding:24px 14px 20px;border-radius:20px}
+      .offer-badge{font-size:11.5px;padding:7px 12px}
+      .old-price{font-size:22px}
+      .offer-subline{font-size:15px}
+      .price{padding:10px 16px 12px;border-radius:18px}
+      .price .amount{font-size:58px}
+      .price .currency{font-size:24px}
+      .price .cents{font-size:22px}
+      .price .usd{font-size:12px;margin-top:20px}
+      .single-pay{font-size:12.5px;padding:8px 12px}
+      .local-price{font-size:14px}
+      .local-note{font-size:11px}
+      .script-slot{min-height:82px;font-size:13px}
+      .urgency{font-size:15px}
+      .last-chance{font-size:16px}
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="top-wrap">
+      <div class="order-status">
+        <div class="status-title"><span class="status-dot"></span> Tu pedido está siendo finalizado</div>
+        <div class="status-text">No actualices ni cierres esta página. Esto puede generar errores en tu pedido.</div>
+      </div>
+
+      <div class="selected">
+        <strong>🎉 ¡Felicidades!</strong>
+        <span>Has sido seleccionado para acceder a esta activación...</span>
+      </div>
+    </div>
+
+    <section class="hero hero-card">
+      <h1>⚠️ Esto no aparece<br>dos veces...<br>y no es para todos.</h1>
+      <p>La oración abrió el camino.</p>
+      <p>La protección mantuvo lo que fue liberado.</p>
+
+      <div class="bridge">⚡ Pero aún falta una parte...</div>
+
+      <div class="mockup-wrap">
+        <img class="mockup-img" src="images/mockup.web" alt="Mockup Frecuencia Celestial" width="500" height="500" onerror="this.onerror=null;this.src='images/mockup.webp';" />
+      </div>
+
+      <div class="product-title">Frecuencia Celestial</div>
+      <p class="lead-audio">🎧 Esto no es un audio común.</p>
+      <p class="copy">Es una frecuencia descubierta hace siglos, utilizada por monjes, líderes espirituales para protección, riqueza y éxito.</p>
+      <p class="copy">La mayoría nunca tendrá acceso a esto.</p>
+
+      <div class="benefits-card">
+        <ul>
+          <li>🎧 Audio de la Frecuencia Celestial</li>
+          <li>🌙 Activación antes de dormir</li>
+          <li>✨ Manuscrito sagrado</li>
+          <li>⚡ Guía simple de uso</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-card">
+        <h2>⚡ ¿Deseas activar ahora la<br>Frecuencia Celestial?</h2>
+
+        <div class="offer-card" id="oferta-principal">
+          <div class="offer-badge">Oferta especial de esta página</div>
+          <div class="offer-stack">
+            <div class="old-price">DE $97</div>
+            <div class="offer-subline">Solo en esta página, ahora</div>
+            <div class="price-wrap">
+              <div class="price" aria-label="27 dólares">
+                <span class="currency">$</span><span class="amount">27</span><span class="cents">.00</span><span class="usd">USD</span>
+              </div>
+              <div class="local-price" data-local-price aria-live="polite"></div>
+              <div class="single-pay">Pago único</div>
+              
+            </div>
+          </div>
+
+          <div class="funnel-wrap" id="upsell-script-top">
+            <iframe 
+              width="100%" height="100%" 
+              id="product-funnel-cmu3ciegb03bj01pr8frhxhuz"
+              src="https://pay.digitalgoat.com.br/ext/funnel/cmu3ciegb03bj01pr8frhxhuz" 
+              frameborder="0" allowtransparency="true">
+            </iframe>
+            <script src="https://app.digitalgoat.com.br/scripts/product-funnel.js"></script>
+          </div>
+        </div>
+
+        <div class="urgency">👇 Si sales ahora... esta oportunidad puede desaparecer.</div>
+        <div class="last-chance">🔥 Esta es la última oportunidad de adquirirlo. Solo se muestra una vez.</div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <section class="section">
+      <div class="section-card">
+        <h2>📦 Esto es exactamente lo que vas<br>a recibir:</h2>
+        <ul class="receive-list">
+          <li>🎧 Acceso inmediato al audio principal</li>
+          <li>🌙 Versión especial para dormir</li>
+          <li>⚡ Manuscrito sagrado</li>
+          <li>✨ Guía completa de uso</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-card">
+        <h2>🔥 ¿Por qué deberías activarlo?</h2>
+        <p>Porque abrir caminos no es suficiente.</p>
+        <p>La mayoría falla en mantener y acelerar lo que recibe.</p>
+
+        <div class="mini-card">
+          <ul>
+            <li>⚡ Aceleración</li>
+            <li>🔄 Continuidad</li>
+            <li>✨ Alineamiento</li>
+          </ul>
+        </div>
+
+        <p class="closing">Si llegaste hasta aquí... no es por casualidad.</p>
+      </div>
+    </section>
+
+    <section class="section bottom-offer">
+      <div class="section-card">
+        <h2>⚡ Activa ahora la Frecuencia<br>Celestial</h2>
+        <div class="offer-card">
+          <div class="offer-badge">Última oportunidad</div>
+          <div class="offer-stack">
+            <div class="old-price">DE $97</div>
+            <div class="offer-subline">Solo en esta página, ahora</div>
+            <div class="price-wrap">
+              <div class="price" aria-label="27 dólares">
+                <span class="currency">$</span><span class="amount">27</span><span class="cents">.00</span><span class="usd">USD</span>
+              </div>
+              <div class="local-price" data-local-price aria-live="polite"></div>
+              <div class="single-pay">Pago único</div>
+              
+            </div>
+          </div>
+
+          <a class="anchor-cta" href="#oferta-principal">Sí, quiero activar la Frecuencia Celestial ahora</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+  (function(){
+    const BASE_USD = 27;
+
+    // Used only if both IP services fail. The main detection reads the
+    // visitor's real currency directly from the IP geolocation response.
+    const countryCurrency = {
+      AD:'EUR', AE:'AED', AF:'AFN', AG:'XCD', AI:'XCD', AL:'ALL', AM:'AMD',
+      AO:'AOA', AR:'ARS', AS:'USD', AT:'EUR', AU:'AUD', AW:'AWG', AX:'EUR',
+      AZ:'AZN', BA:'BAM', BB:'BBD', BD:'BDT', BE:'EUR', BF:'XOF', BG:'BGN',
+      BH:'BHD', BI:'BIF', BJ:'XOF', BL:'EUR', BM:'BMD', BN:'BND', BO:'BOB',
+      BQ:'USD', BR:'BRL', BS:'BSD', BT:'BTN', BW:'BWP', BY:'BYN', BZ:'BZD',
+      CA:'CAD', CC:'AUD', CD:'CDF', CF:'XAF', CG:'XAF', CH:'CHF', CI:'XOF',
+      CK:'NZD', CL:'CLP', CM:'XAF', CN:'CNY', CO:'COP', CR:'CRC', CU:'CUP',
+      CV:'CVE', CW:'ANG', CX:'AUD', CY:'EUR', CZ:'CZK', DE:'EUR', DJ:'DJF',
+      DK:'DKK', DM:'XCD', DO:'DOP', DZ:'DZD', EC:'USD', EE:'EUR', EG:'EGP',
+      EH:'MAD', ER:'ERN', ES:'EUR', ET:'ETB', FI:'EUR', FJ:'FJD', FK:'FKP',
+      FM:'USD', FO:'DKK', FR:'EUR', GA:'XAF', GB:'GBP', GD:'XCD', GE:'GEL',
+      GF:'EUR', GG:'GBP', GH:'GHS', GI:'GIP', GL:'DKK', GM:'GMD', GN:'GNF',
+      GP:'EUR', GQ:'XAF', GR:'EUR', GT:'GTQ', GU:'USD', GW:'XOF', GY:'GYD',
+      HK:'HKD', HN:'HNL', HR:'EUR', HT:'HTG', HU:'HUF', ID:'IDR', IE:'EUR',
+      IL:'ILS', IM:'GBP', IN:'INR', IO:'USD', IQ:'IQD', IR:'IRR', IS:'ISK',
+      IT:'EUR', JE:'GBP', JM:'JMD', JO:'JOD', JP:'JPY', KE:'KES', KG:'KGS',
+      KH:'KHR', KI:'AUD', KM:'KMF', KN:'XCD', KP:'KPW', KR:'KRW', KW:'KWD',
+      KY:'KYD', KZ:'KZT', LA:'LAK', LB:'LBP', LC:'XCD', LI:'CHF', LK:'LKR',
+      LR:'LRD', LS:'LSL', LT:'EUR', LU:'EUR', LV:'EUR', LY:'LYD', MA:'MAD',
+      MC:'EUR', MD:'MDL', ME:'EUR', MF:'EUR', MG:'MGA', MH:'USD', MK:'MKD',
+      ML:'XOF', MM:'MMK', MN:'MNT', MO:'MOP', MP:'USD', MQ:'EUR', MR:'MRU',
+      MS:'XCD', MT:'EUR', MU:'MUR', MV:'MVR', MW:'MWK', MX:'MXN', MY:'MYR',
+      MZ:'MZN', NA:'NAD', NC:'XPF', NE:'XOF', NF:'AUD', NG:'NGN', NI:'NIO',
+      NL:'EUR', NO:'NOK', NP:'NPR', NR:'AUD', NU:'NZD', NZ:'NZD', OM:'OMR',
+      PA:'PAB', PE:'PEN', PF:'XPF', PG:'PGK', PH:'PHP', PK:'PKR', PL:'PLN',
+      PM:'EUR', PN:'NZD', PR:'USD', PS:'ILS', PT:'EUR', PW:'USD', PY:'PYG',
+      QA:'QAR', RE:'EUR', RO:'RON', RS:'RSD', RU:'RUB', RW:'RWF', SA:'SAR',
+      SB:'SBD', SC:'SCR', SD:'SDG', SE:'SEK', SG:'SGD', SH:'SHP', SI:'EUR',
+      SJ:'NOK', SK:'EUR', SL:'SLL', SM:'EUR', SN:'XOF', SO:'SOS', SR:'SRD',
+      SS:'SSP', ST:'STN', SV:'USD', SX:'ANG', SY:'SYP', SZ:'SZL', TC:'USD',
+      TD:'XAF', TG:'XOF', TH:'THB', TJ:'TJS', TK:'NZD', TL:'USD', TM:'TMT',
+      TN:'TND', TO:'TOP', TR:'TRY', TT:'TTD', TV:'AUD', TW:'TWD', TZ:'TZS',
+      UA:'UAH', UG:'UGX', US:'USD', UY:'UYU', UZ:'UZS', VA:'EUR', VC:'XCD',
+      VE:'VES', VG:'USD', VI:'USD', VN:'VND', VU:'VUV', WF:'XPF', WS:'WST',
+      XK:'EUR', YE:'YER', YT:'EUR', ZA:'ZAR', ZM:'ZMW', ZW:'ZWL'
+    };
+
+    // Last-resort approximate rates. These are used only if live FX endpoints
+    // are temporarily unavailable, so the local amount still appears.
+    const fallbackRates = {
+      BRL:5.1445, MXN:17.1447, COP:3124.91, ARS:1450, CLP:930, PEN:3.52,
+      UYU:39.7, PYG:6940, BOB:6.91, CRC:497, GTQ:7.67, HNL:26.2,
+      DOP:62.8, EUR:0.85, GBP:0.74, CAD:1.36, AUD:1.50, NZD:1.67,
+      CHF:0.79, JPY:147.5, CNY:7.12, INR:88.1, KRW:1380, TWD:30.4,
+      SGD:1.28, ZAR:17.1
+    };
+
+    function withTimeout(url, ms){
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), ms);
+      return fetch(url, {
+        cache:'no-store',
+        signal:controller.signal,
+        headers:{'Accept':'application/json'}
+      }).finally(() => clearTimeout(timer));
+    }
+
+    function browserCountry(){
+      const langs = [navigator.language].concat(navigator.languages || []);
+      for (const lang of langs) {
+        const match = String(lang || '').match(/[-_]([A-Z]{2})$/i);
+        if (match) return match[1].toUpperCase();
+      }
+      return null;
+    }
+
+    function normalizeCurrency(value){
+      const code = String(value || '').trim().toUpperCase();
+      return /^[A-Z]{3}$/.test(code) ? code : null;
+    }
+
+    async function detectCurrency(){
+      // Primary: IPWho — returns the currency code directly.
+      try {
+        const r = await withTimeout('https://ipwho.is/', 3500);
+        if (r.ok) {
+          const data = await r.json();
+          const currency = normalizeCurrency(data && data.currency && data.currency.code);
+          if (data && data.success !== false && currency) {
+            return {currency, country:String(data.country_code || '').toUpperCase()};
+          }
+        }
+      } catch(e) {}
+
+      // Secondary: ipapi — also returns the visitor currency directly.
+      try {
+        const r = await withTimeout('https://ipapi.co/json/', 3500);
+        if (r.ok) {
+          const data = await r.json();
+          const currency = normalizeCurrency(data && data.currency);
+          if (currency) {
+            return {currency, country:String(data.country_code || '').toUpperCase()};
+          }
+        }
+      } catch(e) {}
+
+      // Browser fallback: e.g. pt-BR -> BR -> BRL.
+      const country = browserCountry();
+      return {
+        country: country || '',
+        currency: normalizeCurrency(countryCurrency[country])
+      };
+    }
+
+    async function liveRate(currency){
+      // Source 1
+      try {
+        const r = await withTimeout('https://open.er-api.com/v6/latest/USD', 4500);
+        if (r.ok) {
+          const data = await r.json();
+          const rate = Number(data && data.rates && data.rates[currency]);
+          if (Number.isFinite(rate) && rate > 0) return rate;
+        }
+      } catch(e) {}
+
+      // Source 2
+      try {
+        const r = await withTimeout('https://latest.currency-api.pages.dev/v1/currencies/usd.json', 4500);
+        if (r.ok) {
+          const data = await r.json();
+          const rate = Number(data && data.usd && data.usd[currency.toLowerCase()]);
+          if (Number.isFinite(rate) && rate > 0) return rate;
+        }
+      } catch(e) {}
+
+      // Source 3
+      try {
+        const url = 'https://api.frankfurter.app/latest?amount=1&from=USD&to=' + encodeURIComponent(currency);
+        const r = await withTimeout(url, 4500);
+        if (r.ok) {
+          const data = await r.json();
+          const rate = Number(data && data.rates && data.rates[currency]);
+          if (Number.isFinite(rate) && rate > 0) return rate;
+        }
+      } catch(e) {}
+
+      const fallback = Number(fallbackRates[currency]);
+      return Number.isFinite(fallback) && fallback > 0 ? fallback : null;
+    }
+
+    function formatMoney(currency, amount){
+      try {
+        return new Intl.NumberFormat(navigator.language || 'es', {
+          style:'currency',
+          currency:currency
+        }).format(amount);
+      } catch(e) {
+        return amount.toFixed(2) + ' ' + currency;
+      }
+    }
+
+    function showLocalPrice(currency, amount){
+      if (!currency || currency === 'USD' || !Number.isFinite(amount)) return;
+
+      const formatted = formatMoney(currency, amount);
+
+      document.querySelectorAll('[data-local-price]').forEach(el => {
+        el.innerHTML = '≈ <strong>' + formatted + '</strong> <span>' + currency + '</span>';
+        el.style.display = 'block';
+      });
+    }
+
+    async function loadLocalPrice(){
+      const detected = await detectCurrency();
+      const currency = detected && detected.currency;
+
+      if (!currency || currency === 'USD') return;
+
+      const rate = await liveRate(currency);
+      if (!rate) return;
+
+      showLocalPrice(currency, BASE_USD * rate);
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadLocalPrice, {once:true});
+    } else {
+      loadLocalPrice();
+    }
+  })();
+  </script>
+</body>
+</html>
